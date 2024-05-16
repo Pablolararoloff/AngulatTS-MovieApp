@@ -17,16 +17,8 @@ import { MovieSynopsisComponent } from '../movie-synopsis/movie-synopsis.compone
 })
 export class MovieCardComponent implements OnInit {
   movies: any[] = [];
-
-  genre: any = "";
-
-  director: any = "";
-
+  favoriteMovies: string[] = [];
   user: any = {};
-
-  userData = { UserId: "", favoritemovie: [] }
-
-  favoritemovie: any[] = [];
 
   /**
    * Constructor for MovieCardComponent.
@@ -36,150 +28,88 @@ export class MovieCardComponent implements OnInit {
    */
 
   constructor(
-    public fetchApiData: FetchApiDataService,
-    public dialog: MatDialog,
-    public snackBar: MatSnackBar
+    private fetchApiData: FetchApiDataService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) { }
 
   /**
    * Lifecycle hook that is called after data-bound properties of a directive are initialized.
    */
 
-  ngOnInit(): void {
+   ngOnInit(): void {
     this.getMovies();
+    this.getFavoriteMovies();
   }
 
-  /**
-     * Fetches all movies from the API.
-     */
   getMovies(): void {
     this.fetchApiData.getAllMovies().subscribe((resp: any) => {
       this.movies = resp;
-      console.log("movies from API", this.movies)
+      console.log("Movies from API", this.movies);
     });
   }
 
-  /**
-     * Opens a dialog displaying genre details.
-     * @param genre - The genre of the movie.
-     * @param description - The description of the genre.
-     */
+  getFavoriteMovies(): void {
+    const user = localStorage.getItem('user');
+    if (user) {
+      const parsedUser = JSON.parse(user);
+      this.fetchApiData.getFavouriteMovies(parsedUser.userName).subscribe((resp: any) => {
+        this.favoriteMovies = resp;
+        console.log("Favorite movies from API", this.favoriteMovies);
+      });
+    }
+  }
 
   openGenreDialog(genre: string, description: string): void {
     this.dialog.open(GenreInfoComponent, {
-      data: {
-        genre: genre,
-        description: description
-      },
+      data: { genre, description },
       width: '500px'
     });
   }
 
-  /**
-     * Opens a dialog displaying director details.
-     * @param director - The name of the director.
-     * @param bio - The biography of the director.
-     * @param birthdate - The birthdate of the director.
-     */
-  openDirectorDialog(director: string, bio: string, birthdate: string,): void {
+  openDirectorDialog(director: string, bio: string, birthdate: string): void {
     this.dialog.open(DirectorInfoComponent, {
-      data: {
-        director: director,
-        bio: bio,
-        birthdate: birthdate,
-      },
+      data: { director, bio, birthdate },
       width: '500px',
     });
   }
-
-  /**
-    * Opens a dialog displaying movie synopsis.
-    * @param movieName - The name of the movie.
-    * @param description - The synopsis of the movie.
-    */
 
   openSynopsisDialog(movieName: string, description: string): void {
     this.dialog.open(MovieSynopsisComponent, {
-      data: {
-        movieName: movieName,
-        description: description
-      },
+      data: { movieName, description },
       width: '500px',
     });
   }
 
-  getFavorites(): void {
-    this.fetchApiData.getAllMovies().subscribe((resp: any) => {
-      if (Array.isArray(resp)) {
-        this.movies = resp;
-        // Loop through each movie and push its ID into favoritemovie array
-        this.movies.forEach((movie: any) => {
-          this.favoritemovie.push(movie._id);
-        });
-      }
-    });
-  }
-
-  /**
-    * Checks if a movie is in the user's favorite list.
-    * @param movie - The movie to check.
-    * @returns True if the movie is in the favorite list, false otherwise.
-    */
   isFav(movie: any): boolean {
-    return this.favoritemovie.includes(movie._id);
+    return this.favoriteMovies.includes(movie._id);
   }
 
-  /**
-    * Toggles a movie in the user's favorite list.
-    * @param movie - The movie to toggle.
-    */
   toggleFav(movie: any): void {
-    console.log('toggleFav called with movie:', movie);
     const isFavorite = this.isFav(movie);
-    console.log('isFavorite:', isFavorite);
-    isFavorite
-      ? this.deleteFavMovies(movie)
-      : this.addFavMovies(movie);
+    isFavorite ? this.removeFavoriteMovie(movie) : this.addFavoriteMovie(movie);
   }
 
-  /**
-     * Adds a movie to the user's favorite list.
-     * @param movie - The movie to add to favorites.
-     */
-  addFavMovies(movie: any): void {
-    let user = localStorage.getItem('user');
+  addFavoriteMovie(movie: any): void {
+    const user = localStorage.getItem('user');
     if (user) {
-      let parsedUser = JSON.parse(user);
-      console.log('user:', parsedUser);
-      this.userData.UserId = parsedUser._id;
-      console.log('userData:', this.userData);
+      const parsedUser = JSON.parse(user);
       this.fetchApiData.addFavoriteMovie(parsedUser.userName, movie._id).subscribe((resp: any) => {
-        console.log('server response:', resp);
-        localStorage.setItem('user', JSON.stringify(resp));
-        // Add the movie ID to the favoritemovie array
-        this.favoritemovie.push(movie._id);
-        // Show a snack bar message
-        this.snackBar.open(`${movie.movieName} has been added to your favorites`, 'OK', {
+        this.favoriteMovies.push(movie._id);
+        this.snackBar.open(`${movie.Title} has been added to your favorites`, 'OK', {
           duration: 3000,
         });
       });
     }
   }
 
-  /**
-     * Deletes a movie from the user's favorite list.
-     * @param movie - The movie to remove from favorites.
-     */
-  deleteFavMovies(movie: any): void {
-    let user = localStorage.getItem('user');
+  removeFavoriteMovie(movie: any): void {
+    const user = localStorage.getItem('user');
     if (user) {
-      let parsedUser = JSON.parse(user);
+      const parsedUser = JSON.parse(user);
       this.fetchApiData.removeFavoriteMovie(parsedUser.userName, movie._id).subscribe((resp: any) => {
-        localStorage.setItem('user', JSON.stringify(resp));
-        // Remove the movie ID from the favoritemovie array
-        this.favoritemovie = this.favoritemovie.filter((id) => id !== movie._id);
-        // Show a snack bar message
-        this.snackBar.open(`${movie.movieName} has been removed from your favorites`, 'OK', {
+        this.favoriteMovies = this.favoriteMovies.filter((id) => id !== movie._id);
+        this.snackBar.open(`${movie.Title} has been removed from your favorites`, 'OK', {
           duration: 3000,
         });
       });
