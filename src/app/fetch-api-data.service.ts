@@ -85,10 +85,12 @@ export class FetchApiDataService {
   }
 
   // GET USER BY USERNAME
-  getUserByUsername(username: string): Observable<any> {
-    return this.http.get<any>(`${apiUrl}users/${encodeURIComponent(username)}`).pipe(
-      catchError(this.handleError)
-    );
+  getUser(username: string): Observable<any> {
+    return this.http.get(apiUrl + 'users/' + username, {
+      headers: new HttpHeaders({
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      })
+    });
   }
 
   // GET FAVORITE MOVIES

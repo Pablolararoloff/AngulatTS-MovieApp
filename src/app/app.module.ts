@@ -17,23 +17,25 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatMenuModule } from '@angular/material/menu';
+import { NavbarComponent } from './navbar/navbar.component';
 
 // Import application specific modules
-/* import { UserProfileComponent } from './user-profile/user-profile.component'; */
-/* import { DirectorInfoComponent } from './director-info/director-info.component';
-import { GenreInfoComponent } from './genre-info/genre-info.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 import { MovieSynopsisComponent } from './movie-synopsis/movie-synopsis.component';
-import { NavbarComponent } from './navbar/navbar.component'; */
+import { GenreInfoComponent } from './genre-info/genre-info.component';
+import { DirectorInfoComponent } from './director-info/director-info.component';
 import { UserRegistrationFormComponent } from './user-registration-form/user-registration-form.component';
 import { UserLoginFormComponent } from './user-login-form/user-login-form.component';
 import { MovieCardComponent } from './movie-card/movie-card.component';
 import { WelcomePageComponent } from './welcome-page/welcome-page.component';
+import { MatMenuModule } from '@angular/material/menu';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 // Define the routes for the application
 const appRoutes: Routes = [
   { path: 'welcome', component: WelcomePageComponent },
   { path: 'movies', component: MovieCardComponent },
+  { path: 'profile', component: UserProfileComponent },
   { path: 'register', component: UserRegistrationFormComponent },
   { path: 'login', component: UserLoginFormComponent },
   { path: '', redirectTo: 'welcome', pathMatch: 'full' },
@@ -46,26 +48,37 @@ const appRoutes: Routes = [
     UserLoginFormComponent,
     MovieCardComponent,
     WelcomePageComponent,
+    UserProfileComponent,
+    DirectorInfoComponent,
+    NavbarComponent,
+    GenreInfoComponent,
+    MovieSynopsisComponent,
+    
     
   ],
   imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    MatButtonModule,
     MatDialogModule,
     MatInputModule,
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
     MatSnackBarModule,
-    BrowserAnimationsModule,
     RouterModule.forRoot(appRoutes),
     MatIconModule,
     MatToolbarModule,
     MatMenuModule
+    
   ],
   providers: [  
+  
+    provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })
