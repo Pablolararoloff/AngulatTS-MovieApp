@@ -18,8 +18,6 @@ import { MovieSynopsisComponent } from '../movie-synopsis/movie-synopsis.compone
 export class MovieCardComponent implements OnInit {
   movies: any[] = [];
   favoriteMovies: string[] = [];
-  user: any = {};
-  userData = { UserId: "", FavoriteMovies: [] };
 
   /**
    * Constructor for MovieCardComponent.

@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-login-form.component.scss']
 })
 export class UserLoginFormComponent implements OnInit {
-  @Input() user: { Username: string; Password: string } = { Username: '', Password: '' };
+  @Input() user = { Username: '', Password: '' };
 
   /**
    * Initializes the UserLoginFormComponent.
@@ -42,15 +42,14 @@ export class UserLoginFormComponent implements OnInit {
       (response: any) => {
         localStorage.setItem('user', JSON.stringify(response.user));
         localStorage.setItem('token', response.token);
-        this.dialogRef.close();  // Close the login dialog
-        this.router.navigate(['movies']);
-        this.snackBar.open('Login successful!', 'OK', {
+        this.dialogRef.close();
+        this.snackBar.open('Login successful', 'OK', {
           duration: 2000,
         });
+        this.router.navigate(['movies']);
       },
       (error: any) => {
-        console.error('Login error:', error);  // Log the error for debugging
-        this.snackBar.open('Login failed. Please try again.', 'OK', {
+        this.snackBar.open('Login failed', 'OK', {
           duration: 2000,
         });
       }

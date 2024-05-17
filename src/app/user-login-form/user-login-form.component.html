@@ -1,17 +1,21 @@
-<!-- user-login-form.component.html -->
-<div>
-  <h2>Login</h2>
-  <form (ngSubmit)="loginUser()">
+<div class="login-card">
+  <div class="login-header">
+    <h2 class="login-title">Login</h2>
+    <p class="login-card-subtitle">Please enter your credentials</p>
+  </div>
+  <form class="login-form-start" (ngSubmit)="loginUser()">
     <mat-form-field class="full-width">
       <mat-label>Username</mat-label>
-      <input matInput [(ngModel)]="user.Username" name="username" required />
+      <input matInput [(ngModel)]="user.Username" name="Username" required />
     </mat-form-field>
 
     <mat-form-field class="full-width">
       <mat-label>Password</mat-label>
-      <input matInput [(ngModel)]="user.Password" name="password" type="password" required />
+      <input matInput [(ngModel)]="user.Password" name="Password" type="password" required />
     </mat-form-field>
 
-    <button mat-raised-button color="primary" type="submit">Login</button>
+    <div class="login-button">
+      <button mat-raised-button color="primary" type="submit">Login</button>
+    </div>
   </form>
 </div>

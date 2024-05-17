@@ -16,7 +16,7 @@ import { MovieSynopsisComponent } from '../movie-synopsis/movie-synopsis.compone
 })
 export class UserProfileComponent implements OnInit {
   userData: any = {};
-  formUserData: any = {};  // Declare formUserData
+  formUserData: any = {}; 
   user: any = {};
   movies: any[] = [];
   favoritemovie: any[] = [];
@@ -144,79 +144,145 @@ export class UserProfileComponent implements OnInit {
 
   addFavMovies(movie: any): void {
     const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
+    const token = localStorage.getItem('token'); // Ensure the token is available
+    if (!storedUser || !token) {
       this.router.navigate(['welcome']);
       return;
     }
-
+  
     const user = JSON.parse(storedUser);
     const username = user?.Username;
-
-    if (username && movie) {
-      this.fetchApiData.addFavoriteMovie(username, movie._id).subscribe((result: any) => {
-        this.favoriteMoviesIDs.push(movie._id);
+  
+    if (!username) {
+      this.router.navigate(['welcome']);
+      return;
+    }
+  
+    this.fetchApiData.addFavoriteMovie(username, movie._id).subscribe(
+      (result: any) => {
+        // Update favorite movies in the state
+        if (!this.favoriteMoviesIDs.includes(movie._id)) {
+          this.favoriteMoviesIDs.push(movie._id);
+        }
+  
+        if (!this.favoritemovie.some(favMovie => favMovie._id === movie._id)) {
+          this.favoritemovie.push(movie);
+        }
+  
         this.snackBar.open(`${movie.Title} has been added to your favorites`, 'OK', {
           duration: 1000,
         });
-      });
-    } else {
-      this.router.navigate(['welcome']);
-    }
+  
+        // Update the user data in local storage
+        user.FavoriteMovies = this.favoriteMoviesIDs;
+        localStorage.setItem('user', JSON.stringify(user));
+      },
+      (error: any) => {
+        this.snackBar.open('Failed to add favorite movie', 'OK', {
+          duration: 2000,
+        });
+      }
+    );
   }
+  
 
   removeFavMovies(movie: any): void {
     const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
+    const token = localStorage.getItem('token'); // Ensure the token is available
+    if (!storedUser || !token) {
       this.router.navigate(['welcome']);
       return;
     }
+  
+    const user = JSON.parse(storedUser);
+    const username = user?.username;
+  
+    if (!username) {
+      this.router.navigate(['welcome']);
+      return;
+    }
+  
+    this.fetchApiData.removeFavoriteMovie(username, movie._id).subscribe(
+      (result: any) => {
+        this.favoriteMoviesIDs = this.favoriteMoviesIDs.filter((id) => id !== movie._id);
+        this.favoritemovie = this.favoritemovie.filter((favMovie) => favMovie._id !== movie._id);
+        this.snackBar.open(`${movie.Title} has been removed from your favorites`, 'OK', {
+          duration: 1000,
+        });
 
-    const username = JSON.parse(storedUser).Username;
-    this.fetchApiData.removeFavoriteMovie(username, movie._id).subscribe((result: any) => {
-      this.favoriteMoviesIDs = this.favoriteMoviesIDs.filter((id) => id !== movie._id);
-      this.snackBar.open(`${movie.Title} has been removed from your favorites`, 'OK', {
-        duration: 1000,
-      });
-    });
+        user.FavoriteMovies = this.favoriteMoviesIDs;
+        localStorage.setItem('user', JSON.stringify(user));
+      },
+      (error: any) => {
+        this.snackBar.open('Failed to remove favorite movie', 'OK', {
+          duration: 2000,
+        });
+      }
+    );
   }
+  
 
   updateUser(): void {
     const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
     if (!storedUser) {
       this.router.navigate(['welcome']);
       return;
     }
 
-    const username = JSON.parse(storedUser).Username;
-    this.fetchApiData.updateUser(username, this.formUserData).subscribe((result: any) => {
-      localStorage.setItem('user', JSON.stringify(result));
-      this.snackBar.open('User updated successfully!', 'OK', {
-        duration: 2000,
-      });
-      this.getProfile();
-    }, (error: any) => {
-      this.snackBar.open('Failed to update user', 'OK', {
-        duration: 2000,
-      });
-    });
+    const userId = JSON.parse(storedUser)._id;  // Use _id instead of Username
+    this.fetchApiData.updateUser(userId, this.formUserData).subscribe(
+      (result: any) => {
+        // Update the local storage with the new user data and preserve the token
+        const updatedUser = {
+          ...result,
+          token: token // Ensure the token is preserved
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        this.snackBar.open('User updated successfully!', 'OK', {
+          duration: 2000,
+        });
+        this.getProfile();
+      },
+      (error: any) => {
+        this.snackBar.open('Failed to update user', 'OK', {
+          duration: 2000,
+        });
+      }
+    );
   }
 
   async deleteUser(): Promise<void> {
     const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
+    const token = localStorage.getItem('token'); // Ensure the token is available
+    if (!storedUser || !token) {
       this.router.navigate(['welcome']);
       return;
     }
-
-    const username = JSON.parse(storedUser).Username;
+  
+    const user = JSON.parse(storedUser);
+    const userId = user?._id;
+  
+    if (!userId) {
+      this.router.navigate(['welcome']);
+      return;
+    }
+  
     if (confirm('Do you want to delete your account permanently?')) {
-      this.fetchApiData.deleteUser(username).subscribe(() => {
-        this.snackBar.open('Account deleted successfully!', 'OK', {
-          duration: 3000,
-        });
-        localStorage.clear();
-        this.router.navigate(['welcome']);
-      });
+      this.fetchApiData.deleteUser(userId).subscribe(
+        () => {
+          this.snackBar.open('Account deleted successfully!', 'OK', {
+            duration: 3000,
+          });
+          localStorage.clear();
+          this.router.navigate(['welcome']);
+        },
+        (error: any) => {
+          this.snackBar.open('Failed to delete account', 'OK', {
+            duration: 2000,
+          });
+        }
+      );
     }
   }
 

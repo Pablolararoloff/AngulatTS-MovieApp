@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { FetchApiDataService } from '../fetch-api-data.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -10,25 +10,28 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./user-registration-form.component.scss']
 })
 export class UserRegistrationFormComponent implements OnInit {
-  @Input() userData = { Username: '', Password: '', Email: '', Birthday: '' };
+  userData = { Username: '', Password: '', Email: '', Birthday: '' };
 
   constructor(
     public fetchApiData: FetchApiDataService,
     public dialogRef: MatDialogRef<UserRegistrationFormComponent>,
-    public snackBar: MatSnackBar) { }
+    public snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void { }
 
   registerUser(): void {
-    this.fetchApiData.userRegistration(this.userData).subscribe((result) => {
-      this.dialogRef.close();
-      this.snackBar.open('Registration successful', 'OK', {
-        duration: 2000
-      });
-    }, (error) => {
-      this.snackBar.open(error, 'OK', {
-        duration: 2000
-      });
+    this.fetchApiData.userRegistration(this.userData).subscribe(
+      (result: any) => {
+        this.dialogRef.close();
+        this.snackBar.open('Registration successful', 'OK', {
+          duration: 2000
+        });
+      },
+      (error: any) => {
+        this.snackBar.open('Registration failed: ' + error, 'OK', {
+          duration: 2000
+        });
     });
   }
 }

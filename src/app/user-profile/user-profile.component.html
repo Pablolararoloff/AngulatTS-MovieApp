@@ -10,7 +10,7 @@
       </div>
       <div class="user-info-display">
         <label>Birthday</label>
-        <span>{{ userData.Birthday | date : "longDate" }}</span>
+        <span>{{ userData.Birthday | date: 'longDate' }}</span>
       </div>
       <div class="user-info-display">
         <label>Email</label>
@@ -19,17 +19,17 @@
       <div class="update-user-info">
         <h2>Update User Info</h2>
         <form (ngSubmit)="updateUser()" class="example-form">
-          <mat-form-field class="example-full-width">
-            <mat-label>Name: </mat-label>
-            <input matInput type="text" [(ngModel)]="userData.Username" name="name" placeholder="Name" />
+          <mat-form-field class="full-width">
+            <mat-label>Name</mat-label>
+            <input matInput type="text" [(ngModel)]="formUserData.Username" name="name" placeholder="Name" />
           </mat-form-field>
-          <mat-form-field class="example-full-width">
-            <mat-label>Birthday: </mat-label>
-            <input matInput type="date" [(ngModel)]="userData.Birthday" name="birthday" placeholder="Birthday" />
+          <mat-form-field class="full-width">
+            <mat-label>Birthday</mat-label>
+            <input matInput type="date" [(ngModel)]="formUserData.Birthday" name="birthday" placeholder="Birthday" />
           </mat-form-field>
-          <mat-form-field class="example-full-width">
-            <mat-label>Email: </mat-label>
-            <input matInput type="email" [(ngModel)]="userData.Email" name="email" placeholder="Email" />
+          <mat-form-field class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" [(ngModel)]="formUserData.Email" name="email" placeholder="Email" />
           </mat-form-field>
           <div class="button-container">
             <button mat-raised-button type="submit" color="primary">Update</button>
