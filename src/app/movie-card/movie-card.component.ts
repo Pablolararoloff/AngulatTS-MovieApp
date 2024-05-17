@@ -19,6 +19,7 @@ export class MovieCardComponent implements OnInit {
   movies: any[] = [];
   favoriteMovies: string[] = [];
   user: any = {};
+  userData = { UserId: "", FavoriteMovies: [] };
 
   /**
    * Constructor for MovieCardComponent.
@@ -53,7 +54,7 @@ export class MovieCardComponent implements OnInit {
     const user = localStorage.getItem('user');
     if (user) {
       const parsedUser = JSON.parse(user);
-      this.fetchApiData.getFavouriteMovies(parsedUser.userName).subscribe((resp: any) => {
+      this.fetchApiData.getFavoriteMovies(parsedUser.username).subscribe((resp: any) => {
         this.favoriteMovies = resp;
         console.log("Favorite movies from API", this.favoriteMovies);
       });
@@ -94,7 +95,7 @@ export class MovieCardComponent implements OnInit {
     const user = localStorage.getItem('user');
     if (user) {
       const parsedUser = JSON.parse(user);
-      this.fetchApiData.addFavoriteMovie(parsedUser.userName, movie._id).subscribe((resp: any) => {
+      this.fetchApiData.addFavoriteMovie(parsedUser.username, movie._id).subscribe((resp: any) => {
         this.favoriteMovies.push(movie._id);
         this.snackBar.open(`${movie.Title} has been added to your favorites`, 'OK', {
           duration: 3000,
@@ -107,12 +108,21 @@ export class MovieCardComponent implements OnInit {
     const user = localStorage.getItem('user');
     if (user) {
       const parsedUser = JSON.parse(user);
-      this.fetchApiData.removeFavoriteMovie(parsedUser.userName, movie._id).subscribe((resp: any) => {
+    const userId = parsedUser._id; // Ensure you are using the correct property for user ID
+    this.fetchApiData.removeFavoriteMovie(userId, movie._id).subscribe({
+      next: (resp: any) => {
         this.favoriteMovies = this.favoriteMovies.filter((id) => id !== movie._id);
         this.snackBar.open(`${movie.Title} has been removed from your favorites`, 'OK', {
           duration: 3000,
         });
-      });
-    }
+      },
+      error: (err: any) => {
+        this.snackBar.open(`Failed to remove ${movie.Title} from your favorites`, 'OK', {
+          duration: 3000,
+        });
+        console.error(err);
+      }
+    });
   }
+}
 }

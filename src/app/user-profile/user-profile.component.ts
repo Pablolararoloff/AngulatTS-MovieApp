@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FetchApiDataService } from '../fetch-api-data.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,16 +15,8 @@ import { MovieSynopsisComponent } from '../movie-synopsis/movie-synopsis.compone
   styleUrls: ['./user-profile.component.scss']
 })
 export class UserProfileComponent implements OnInit {
-  @Input() userData: any = { userName: '', password: '', email: '', birthday: '' };
-
-  formUserData: any = {
-    userName: '',
-    password: '',
-    email: '',
-    birthday: '',
-    favoriteMovie: []
-  };
-
+  userData: any = {};
+  formUserData: any = {};  // Declare formUserData
   user: any = {};
   movies: any[] = [];
   favoritemovie: any[] = [];
@@ -38,37 +30,84 @@ export class UserProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.getUserData();
     this.getProfile();
     this.getMovies();
     this.getFavMovies();
   }
 
+  getUserData(): void {
+    const user = localStorage.getItem('user');
+    console.log('User from local storage:', user);  // Debugging line
+    if (!user) {
+      this.router.navigate(['welcome']);
+      return;
+    }
+
+    const parsedUser = JSON.parse(user);
+    const username = parsedUser?.username;
+    console.log('Parsed user:', parsedUser);  // Debugging line
+    console.log('Username from parsed user:', username);  // Debugging line
+
+    if (!username) {
+      this.router.navigate(['welcome']);
+      return;
+    }
+
+    this.fetchApiData.getUser(username).subscribe(
+      (res: any) => {
+        console.log('Fetched user data:', res);  // Debugging line
+        this.userData = res;
+      },
+      (error: any) => {
+        console.error('Error fetching user data', error);
+        this.router.navigate(['welcome']);
+      }
+    );
+  }
+
   getProfile(): void {
     const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-    const username = user ? user.Username : '';
+    console.log('Stored user from local storage:', storedUser);  // Debugging line
+    if (!storedUser) {
+      this.router.navigate(['welcome']);
+      return;
+    }
 
-    if (username) {
-      this.fetchApiData.getUser(username).subscribe((result: any) => {
+    const user = JSON.parse(storedUser);
+    const username = user?.username;
+
+    console.log('Username from parsed user:', username);  // Debugging line
+
+    if (!username) {
+      this.router.navigate(['welcome']);
+      return;
+    }
+
+    this.fetchApiData.getUser(username).subscribe(
+      (result: any) => {
+        console.log('Profile data fetched:', result);  // Debugging line
         this.user = result;
-        this.userData.userName = this.user.Username;
-        this.userData.email = this.user.Email;
+        this.userData.Username = this.user.Username;
+        this.userData.Email = this.user.Email;
         if (this.user.Birthday) {
           const birthday = new Date(this.user.Birthday);
           if (!isNaN(birthday.getTime())) {
-            this.userData.birthday = birthday.toISOString().split('T')[0];
+            this.userData.Birthday = birthday.toISOString().split('T')[0];
           }
         }
-        this.formUserData = { ...this.userData };
+        this.formUserData = { ...this.userData };  // Initialize formUserData
         this.favoriteMoviesIDs = this.user.FavoriteMovies;
 
         this.fetchApiData.getAllMovies().subscribe((movies: any[]) => {
           this.favoritemovie = movies.filter((movie: any) => this.favoriteMoviesIDs.includes(movie._id));
         });
-      });
-    } else {
-      this.router.navigate(['welcome']);
-    }
+      },
+      (error: any) => {
+        console.error('Error fetching profile data', error);
+        this.router.navigate(['welcome']);
+      }
+    );
   }
 
   getMovies(): void {
@@ -82,14 +121,16 @@ export class UserProfileComponent implements OnInit {
 
   getFavMovies(): void {
     const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-    const username = user ? user.Username : '';
+    if (!storedUser) return;
 
-    if (username) {
-      this.fetchApiData.getUser(username).subscribe((result: any) => {
-        this.favoriteMoviesIDs = result.FavoriteMovies;
-      });
-    }
+    const user = JSON.parse(storedUser);
+    const username = user?.Username;
+
+    if (!username) return;
+
+    this.fetchApiData.getUser(username).subscribe((result: any) => {
+      this.favoriteMoviesIDs = result.FavoriteMovies;
+    });
   }
 
   isFav(movie: any): boolean {
@@ -103,13 +144,17 @@ export class UserProfileComponent implements OnInit {
 
   addFavMovies(movie: any): void {
     const storedUser = localStorage.getItem('user');
-    const user = storedUser ? JSON.parse(storedUser) : null;
-    const username = user ? user.Username : '';
+    if (!storedUser) {
+      this.router.navigate(['welcome']);
+      return;
+    }
+
+    const user = JSON.parse(storedUser);
+    const username = user?.Username;
 
     if (username && movie) {
       this.fetchApiData.addFavoriteMovie(username, movie._id).subscribe((result: any) => {
-        localStorage.setItem('user', JSON.stringify(result));
-        this.getFavMovies();
+        this.favoriteMoviesIDs.push(movie._id);
         this.snackBar.open(`${movie.Title} has been added to your favorites`, 'OK', {
           duration: 1000,
         });
@@ -118,6 +163,7 @@ export class UserProfileComponent implements OnInit {
       this.router.navigate(['welcome']);
     }
   }
+
   removeFavMovies(movie: any): void {
     const storedUser = localStorage.getItem('user');
     if (!storedUser) {
@@ -127,9 +173,7 @@ export class UserProfileComponent implements OnInit {
 
     const username = JSON.parse(storedUser).Username;
     this.fetchApiData.removeFavoriteMovie(username, movie._id).subscribe((result: any) => {
-      localStorage.setItem('user', JSON.stringify(result));
       this.favoriteMoviesIDs = this.favoriteMoviesIDs.filter((id) => id !== movie._id);
-      this.getFavMovies();
       this.snackBar.open(`${movie.Title} has been removed from your favorites`, 'OK', {
         duration: 1000,
       });

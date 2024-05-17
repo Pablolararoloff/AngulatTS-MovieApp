@@ -13,11 +13,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-login-form.component.scss']
 })
 export class UserLoginFormComponent implements OnInit {
-  @Input() userData = { Username: '', Password: '' };
+  @Input() user: { Username: string; Password: string } = { Username: '', Password: '' };
 
-   /**
+  /**
    * Initializes the UserLoginFormComponent.
-   * @param {UserLoginService} fetchApiData - Service for user login.
+   * @param {FetchApiDataService} fetchApiData - Service for user login.
    * @param {MatDialogRef<UserLoginFormComponent>} dialogRef - Reference to the dialog.
    * @param {MatSnackBar} snackBar - Angular Material's MatSnackBar service.
    * @param {Router} router - Angular's Router service for navigation.
@@ -29,26 +29,31 @@ export class UserLoginFormComponent implements OnInit {
     private router: Router  
   ) { }
 
-   /**
+  /**
    * Angular lifecycle hook called after component initialization.
    */
-   ngOnInit(): void {}
-   /**
-    * Logs in the user.
-    */
-   loginUser(): void {
-    this.fetchApiData.userLogin(this.userData).subscribe((result) => {
-      localStorage.setItem('user', result.user.Username);
-      localStorage.setItem('token', result.token);
-      this.dialogRef.close();
-      this.snackBar.open('Login successful', 'OK', {
-        duration: 2000
-      });
-      this.router.navigate(['movies']);
-    }, (error) => {
-      this.snackBar.open(error, 'OK', {
-        duration: 2000
-      });
-    });
+  ngOnInit(): void {}
+
+  /**
+   * Logs in the user.
+   */
+  loginUser(): void {
+    this.fetchApiData.userLogin(this.user).subscribe(
+      (response: any) => {
+        localStorage.setItem('user', JSON.stringify(response.user));
+        localStorage.setItem('token', response.token);
+        this.dialogRef.close();  // Close the login dialog
+        this.router.navigate(['movies']);
+        this.snackBar.open('Login successful!', 'OK', {
+          duration: 2000,
+        });
+      },
+      (error: any) => {
+        console.error('Login error:', error);  // Log the error for debugging
+        this.snackBar.open('Login failed. Please try again.', 'OK', {
+          duration: 2000,
+        });
+      }
+    );
   }
 }

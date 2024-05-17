@@ -1,0 +1,64 @@
+.movies-grid {
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+
+  .movie-card {
+    max-width: 300px;
+    width: 100%;
+    margin: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 10px;
+
+    &:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    mat-card-header {
+      background-color: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+
+      mat-card-title {
+        font-size: 1.2em;
+        font-weight: bold;
+        text-align: center;
+        color: #333;
+      }
+    }
+
+    img {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    mat-card-content {
+      padding: 10px;
+
+      .button-container {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        margin-top: 10px;
+
+        .custom-button {
+          margin: 5px 0;
+          min-width: 80px;
+        }
+
+        mat-icon-button {
+          margin-top: 10px;
+
+          mat-icon {
+            font-size: 24px;
+            color: #f44336; /* Color for the favorite icon */
+          }
+        }
+      }
+    }
+  }
+}
