@@ -22,10 +22,16 @@
       "dom"
     ]
   },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
+  },
+  "typedocOptions": {
+    "entryPoints": ["src/main.ts", "src/app/app.module.ts"],
+    "out": "docs"
   }
 }

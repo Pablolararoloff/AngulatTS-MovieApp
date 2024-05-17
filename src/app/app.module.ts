@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, provideClientHydration  } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Routes } from '@angular/router';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+
 
 // Import Angular Material modules
 import { MatInputModule } from '@angular/material/input';
@@ -39,6 +39,7 @@ const appRoutes: Routes = [
   { path: 'register', component: UserRegistrationFormComponent },
   { path: 'login', component: UserLoginFormComponent },
   { path: '', redirectTo: 'welcome', pathMatch: 'full' },
+  { path: 'profile', redirectTo: 'welcome', pathMatch: 'prefix' },
  ];
 
 @NgModule({
@@ -53,20 +54,16 @@ const appRoutes: Routes = [
     NavbarComponent,
     GenreInfoComponent,
     MovieSynopsisComponent,
-    
-    
-  ],
+     ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    BrowserModule,
     HttpClientModule,
     FormsModule,
     MatButtonModule,
     MatDialogModule,
     MatInputModule,
-    MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
     MatSnackBarModule,
@@ -76,10 +73,7 @@ const appRoutes: Routes = [
     MatMenuModule
     
   ],
-  providers: [  
-  
-    provideAnimationsAsync()
-  ],
+  providers: [provideClientHydration(), provideAnimationsAsync()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

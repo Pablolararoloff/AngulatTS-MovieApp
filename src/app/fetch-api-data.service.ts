@@ -10,7 +10,7 @@ import { catchError, map } from 'rxjs/operators';
 export class FetchApiDataService {
 
 // Declaring the API URL that will provide data for the client app
-  private apiUrl = 'https://letflix-0d183cd4a94e.herokuapp.com';
+public  apiUrl = 'https://letflix-0d183cd4a94e.herokuapp.com';
 
   constructor(private http: HttpClient) {}
 

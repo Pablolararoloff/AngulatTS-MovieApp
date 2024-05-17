@@ -1,0 +1,4 @@
+{
+  "entryPoints": ["src/main.ts", "src/app/app.module.ts"],
+  "out": "docs"
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FetchApiDataService } from '../fetch-api-data.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -16,8 +16,12 @@ import { MovieSynopsisComponent } from '../movie-synopsis/movie-synopsis.compone
   styleUrls: ['./movie-card.component.scss']
 })
 export class MovieCardComponent implements OnInit {
-  movies: any[] = [];
-  favoriteMovies: string[] = [];
+  @Input() movies: any[] = [];
+  @Input() favoriteMovies: string[] = [];
+  @Output() toggleFavorite = new EventEmitter<any>();
+  @Output() openGenreDialogEvent = new EventEmitter<any>();
+  @Output() openDirectorDialogEvent = new EventEmitter<any>();
+  @Output() openSynopsisDialogEvent = new EventEmitter<any>();
 
   /**
    * Constructor for MovieCardComponent.
@@ -106,21 +110,20 @@ export class MovieCardComponent implements OnInit {
     const user = localStorage.getItem('user');
     if (user) {
       const parsedUser = JSON.parse(user);
-    const userId = parsedUser._id; // Ensure you are using the correct property for user ID
-    this.fetchApiData.removeFavoriteMovie(userId, movie._id).subscribe({
-      next: (resp: any) => {
-        this.favoriteMovies = this.favoriteMovies.filter((id) => id !== movie._id);
-        this.snackBar.open(`${movie.Title} has been removed from your favorites`, 'OK', {
-          duration: 3000,
-        });
-      },
-      error: (err: any) => {
-        this.snackBar.open(`Failed to remove ${movie.Title} from your favorites`, 'OK', {
-          duration: 3000,
-        });
-        console.error(err);
-      }
-    });
+      this.fetchApiData.removeFavoriteMovie(parsedUser.username, movie._id).subscribe({
+        next: (resp: any) => {
+          this.favoriteMovies = this.favoriteMovies.filter((favMovieId) => favMovieId !== movie._id);
+          this.snackBar.open(`${movie.Title} has been removed from your favorites`, 'OK', {
+            duration: 3000,
+          });
+        },
+        error: (err: any) => {
+          this.snackBar.open(`Failed to remove ${movie.Title} from your favorites`, 'OK', {
+            duration: 3000,
+          });
+          console.error(err);
+        }
+      });
+    }
   }
-}
-}
+ }
