@@ -45,13 +45,19 @@ export class MovieCardComponent implements OnInit {
     this.getFavoriteMovies();
   }
 
+/**
+   * Fetches all movies.
+   */
   getMovies(): void {
     this.fetchApiData.getAllMovies().subscribe((resp: any) => {
       this.movies = resp;
       console.log("Movies from API", this.movies);
     });
   }
-
+/**
+ * Fetches the favorite movies of the current user from the API and assigns the response to the `favoriteMovies` property.
+ * Checks if the user is available in local storage before making the API call.
+ */
   getFavoriteMovies(): void {
     const user = localStorage.getItem('user');
     if (user) {
@@ -62,7 +68,11 @@ export class MovieCardComponent implements OnInit {
       });
     }
   }
-
+/**
+ * Opens a dialog to display genre information.
+ * @param genre - The genre name.
+ * @param description - The description of the genre.
+ */
   openGenreDialog(genre: string, description: string): void {
     this.dialog.open(GenreInfoComponent, {
       data: { genre, description },
@@ -70,6 +80,12 @@ export class MovieCardComponent implements OnInit {
     });
   }
 
+/**
+ * Opens a dialog to display director information.
+ * @param director - The name of the director.
+ * @param bio - The biography of the director.
+ * @param birthdate - The birthdate of the director.
+ */
   openDirectorDialog(director: string, bio: string, birthdate: string): void {
     this.dialog.open(DirectorInfoComponent, {
       data: { director, bio, birthdate },
@@ -77,22 +93,42 @@ export class MovieCardComponent implements OnInit {
     });
   }
 
+/**
+ * Opens a dialog to display movie synopsis.
+ * @param movieName - The name of the movie.
+ * @param description - The synopsis of the movie.
+ */
   openSynopsisDialog(movieName: string, description: string): void {
     this.dialog.open(MovieSynopsisComponent, {
       data: { movieName, description },
       width: '500px',
     });
   }
-
+/**
+ * Checks if a movie is in the list of favorite movies.
+ * @param movie - The movie object.
+ * @returns True if the movie is a favorite, false otherwise.
+ */
   isFav(movie: any): boolean {
     return this.favoriteMovies.includes(movie._id);
   }
-
+/**
+ * Toggles the favorite status of a movie.
+ * If the movie is a favorite, it will be removed from the favorite list.
+ * If the movie is not a favorite, it will be added to the favorite list.
+ * @param movie - The movie object.
+ */
   toggleFav(movie: any): void {
     const isFavorite = this.isFav(movie);
     isFavorite ? this.removeFavoriteMovie(movie) : this.addFavoriteMovie(movie);
   }
 
+ /**
+ * Adds a movie to the user's list of favorite movies.
+ * Checks if the user is available in local storage before making the API call.
+ * On success, adds the movie ID to the `favoriteMovies` array and shows a confirmation message.
+ * @param movie - The movie object to be added to favorites.
+ */
   addFavoriteMovie(movie: any): void {
     const user = localStorage.getItem('user');
     if (user) {
@@ -105,7 +141,13 @@ export class MovieCardComponent implements OnInit {
       });
     }
   }
-
+/**
+ * Removes a movie from the user's list of favorite movies.
+ * Checks if the user is available in local storage before making the API call.
+ * On success, removes the movie ID from the `favoriteMovies` array and shows a confirmation message.
+ * On error, shows a failure message and logs the error.
+ * @param movie - The movie object to be removed from favorites.
+ */
   removeFavoriteMovie(movie: any): void {
     const user = localStorage.getItem('user');
     if (user) {

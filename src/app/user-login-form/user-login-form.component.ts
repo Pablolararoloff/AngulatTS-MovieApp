@@ -35,8 +35,10 @@ export class UserLoginFormComponent implements OnInit {
   ngOnInit(): void {}
 
   /**
-   * Logs in the user.
-   */
+    * @description Sends user login form information to the backend.
+    * Closes the dialog on success, displays a success message, and navigates to the movies page.
+    * Shows an error message on failure and logs the error.
+    */
   loginUser(): void {
     this.fetchApiData.userLogin(this.user).subscribe(
       (response: any) => {
