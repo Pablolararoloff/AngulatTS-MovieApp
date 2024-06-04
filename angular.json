@@ -38,7 +38,8 @@
             "prerender": true,
             "ssr": {
               "entry": "server.ts"
-            }
+            },
+            "baseHref": "/AngulatTS-MovieApp/"
           },
           "configurations": {
             "production": {
@@ -54,7 +55,8 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "/AngulatTS-MovieApp/"
             },
             "development": {
               "optimization": false,
