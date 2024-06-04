@@ -1,9 +1,0 @@
-{
-  "routes": [
-    "/login",
-    "/movies",
-    "/profile",
-    "/register",
-    "/welcome"
-  ]
-}
