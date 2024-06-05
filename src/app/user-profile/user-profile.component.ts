@@ -3,6 +3,7 @@ import { FetchApiDataService } from '../fetch-api-data.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { StorageService } from '../services/storage.service';
 
 // Component Imports
 import { DirectorInfoComponent } from '../director-info/director-info.component';
@@ -26,7 +27,8 @@ export class UserProfileComponent implements OnInit {
     public fetchApiData: FetchApiDataService,
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
-    public router: Router
+    public router: Router,
+    private storageService: StorageService
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +39,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   getUserData(): void {
-    const user = localStorage.getItem('user');
+    const user = this.storageService.getItem('user');
     console.log('User from local storage:', user);  // Debugging line
     if (!user) {
       this.router.navigate(['welcome']);
@@ -67,7 +69,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   getProfile(): void {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = this.storageService.getItem('user');
     console.log('Stored user from local storage:', storedUser);  // Debugging line
     if (!storedUser) {
       this.router.navigate(['welcome']);
@@ -120,7 +122,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   getFavMovies(): void {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = this.storageService.getItem('user');
     if (!storedUser) return;
 
     const user = JSON.parse(storedUser);
@@ -143,8 +145,8 @@ export class UserProfileComponent implements OnInit {
   }
 
   addFavMovies(movie: any): void {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token'); // Ensure the token is available
+    const storedUser = this.storageService.getItem('user');
+    const token = this.storageService.getItem('token'); // Ensure the token is available
     if (!storedUser || !token) {
       this.router.navigate(['welcome']);
       return;
@@ -175,7 +177,7 @@ export class UserProfileComponent implements OnInit {
   
         // Update the user data in local storage
         user.FavoriteMovies = this.favoriteMoviesIDs;
-        localStorage.setItem('user', JSON.stringify(user));
+        this.storageService.setItem('user', JSON.stringify(user));
       },
       (error: any) => {
         this.snackBar.open('Failed to add favorite movie', 'OK', {
@@ -184,11 +186,10 @@ export class UserProfileComponent implements OnInit {
       }
     );
   }
-  
 
   removeFavMovies(movie: any): void {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token'); // Ensure the token is available
+    const storedUser = this.storageService.getItem('user');
+    const token = this.storageService.getItem('token'); // Ensure the token is available
     if (!storedUser || !token) {
       this.router.navigate(['welcome']);
       return;
@@ -211,7 +212,7 @@ export class UserProfileComponent implements OnInit {
         });
 
         user.FavoriteMovies = this.favoriteMoviesIDs;
-        localStorage.setItem('user', JSON.stringify(user));
+        this.storageService.setItem('user', JSON.stringify(user));
       },
       (error: any) => {
         this.snackBar.open('Failed to remove favorite movie', 'OK', {
@@ -220,11 +221,10 @@ export class UserProfileComponent implements OnInit {
       }
     );
   }
-  
 
   updateUser(): void {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
+    const storedUser = this.storageService.getItem('user');
+    const token = this.storageService.getItem('token');
     if (!storedUser) {
       this.router.navigate(['welcome']);
       return;
@@ -238,7 +238,7 @@ export class UserProfileComponent implements OnInit {
           ...result,
           token: token // Ensure the token is preserved
         };
-        localStorage.setItem('user', JSON.stringify(updatedUser));
+        this.storageService.setItem('user', JSON.stringify(updatedUser));
         this.snackBar.open('User updated successfully!', 'OK', {
           duration: 2000,
         });
@@ -253,8 +253,8 @@ export class UserProfileComponent implements OnInit {
   }
 
   async deleteUser(): Promise<void> {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token'); // Ensure the token is available
+    const storedUser = this.storageService.getItem('user');
+    const token = this.storageService.getItem('token'); // Ensure the token is available
     if (!storedUser || !token) {
       this.router.navigate(['welcome']);
       return;
@@ -274,7 +274,7 @@ export class UserProfileComponent implements OnInit {
           this.snackBar.open('Account deleted successfully!', 'OK', {
             duration: 3000,
           });
-          localStorage.clear();
+          this.storageService.clear();
           this.router.navigate(['welcome']);
         },
         (error: any) => {
